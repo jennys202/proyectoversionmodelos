@@ -1,0 +1,106 @@
+function actualizarUI(){
+
+const score=silhouette(app.dataset,app.clusters)
+
+info.innerText=
+"K="+app.k+" silhouette="+score.toFixed(3)
+
+dibujarMapa()
+
+}
+
+selectorK.onchange=e=>{
+
+app.k=parseInt(e.target.value)
+
+app.clusters=kmeans(app.dataset,app.k)
+
+actualizarUI()
+
+}
+
+
+function metodosActivos(){
+
+return [...document.querySelectorAll(".methodCheck:checked")]
+.map(cb=>cb.value)
+
+}
+
+document.querySelectorAll(".methodCheck")
+.forEach(cb=>{
+
+cb.onchange=()=>{
+
+app.recalcular()
+
+}
+
+})
+
+document
+.querySelectorAll('input[name="modoColor"]')
+.forEach(r => {
+
+r.onchange = e => {
+
+app.modoColor = e.target.value
+
+dibujarMapas()
+
+}
+
+})
+
+document
+.querySelectorAll('input[name="algoritmo"]')
+.forEach(r=>{
+
+r.onchange = e =>{
+
+app.algoritmo = e.target.value
+
+app.recalcular()
+
+}
+
+})
+
+function crearSelectorColores(){
+
+const panel = document.getElementById("colorPanel")
+
+panel.innerHTML = ""
+
+for(let i=0;i<app.k;i++){
+
+const label = document.createElement("label")
+label.textContent = "C"+i+": "
+
+const input = document.createElement("input")
+
+input.type = "color"
+input.value = app.colors[i] || "#000000"
+
+input.oninput = e =>{
+
+app.colors[i] = e.target.value
+
+dibujarMapas()
+
+}
+
+label.appendChild(input)
+panel.appendChild(label)
+
+}
+
+}
+
+document.getElementById("eps").onchange = e=>{
+app.eps = parseFloat(e.target.value)
+}
+
+document.getElementById("minPts").onchange = e=>{
+app.minPts = parseInt(e.target.value)
+}

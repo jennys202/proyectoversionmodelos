@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="utf-8">
+<title>Dashboard población municipios Valladolid</title>
+
+<link rel="stylesheet" href="styles.css">
+
+<script src="data/shapes.js" defer></script>
+<script src="data/localidades_con_codigo.js" defer></script>
+<script src="data/poblacion.js" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+
+<script src="js/clustering.js" defer></script>
+<script src="js/map.js" defer></script>
+<script src="js/chart.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/app.js" defer></script>
+
+</head>
+
+<body>
+
+<h2 class="title">Dashboard población municipios Valladolid</h2>
+
+<div class="controls">
+
+<span id="info"></span>
+
+<div class="method-filter">
+
+<div class="filterGroup">
+    <label>Modelos</label>
+    <div class="inline">
+        <label><input type="checkbox" class="methodCheck" value="corr" checked> Correlación</label>
+        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
+        <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
+        <label><input type="checkbox" class="methodCheck" value="mm"> Máximos y mínimos</label>
+    </div>
+</div>
+
+
+<div class="filterGroup">
+    <label>Colores</label>
+    <div id="colorPanel" class="inline"></div>
+  </div>
+
+  <div class="filterGroup">
+    <label>Visualización</label>
+    <div class="inline">
+      <label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label>
+      <label><input type="radio" name="modoColor" value="centroide"> Por centroide</label>
+    </div>
+  </div>
+
+
+<div class="filterGroup">
+    <label>Algoritmo</label>
+    <div class="inline">
+      <label><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
+      <label><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
+      <label><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
+    </div>
+  </div>
+
+  <div class="filterGroup">
+    <label>KMEANS</label>
+    <div class="inline">
+      <label>
+        K:
+        <select id="selectorK">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    </label>
+    </div>
+</div>
+
+<div class="filterGroup">
+    <label>DBSCAN</label>
+    <div class="inline">
+      <label>eps <input type="number" id="eps" step="0.01" value="0.15"></label>
+      <label>minPts <input type="number" id="minPts" value="3"></label>
+    </div>
+</div>
+
+
+</div>
+
+<div class="panel">
+
+<div id="mapsContainer"></div>
+
+<div class="chart-container">
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+<div id="tooltip" class="tooltip"></div>
+
+</body>
+</html>
