@@ -11,6 +11,7 @@ const escalaCentroide=[
 ]
 
 function dibujarMapas(){
+   console.log("DIBUJANDO MAPAS") 
 
 const container=document.getElementById("mapsContainer")
 
@@ -58,6 +59,14 @@ const cluster=clusters[loc.codigo] ?? 0
 
 let color
 
+if(app.algoritmo === "dbscan"){
+    app.modoColor="cluster";
+} 
+else{
+    app.modoColor="centroide"
+}
+console.log("ANTES DE COLOR "+app.modoColor)
+
 if(cluster === -1){
 
 color = "#cccccc"  // gris para ruido
@@ -78,6 +87,8 @@ COLOR POR CENTROIDE
 ===================== */
 
 else{
+    console.log("centroides ANTES DE COLOR")
+    color = app.colors[cluster % app.colors.length]
 
 const baseColor = app.colors[cluster]
 
@@ -110,9 +121,23 @@ const factor = Math.pow(rawFactor, 0.5)
 
 /* aplicar aclarado */
 
-color = aclararColor(baseColor,factor)
+//color = aclararColor(baseColor,factor)
+console.log("COLOR:", color)
+// intensidad del usuario (slider)
+const intensidad = window.intensidad || 0.75
+
+//garantizar que el centroide use color puro
+const factorFinal = Math.pow(factor, 0.4) * intensidad
+
+if (factor < 0.05) {
+    color = baseColor
+} else {
+    color = ajustarIntensidad(baseColor, factorFinal)
+}
+
 
 }
+
 
 /* =====================
 DIBUJAR MUNICIPIO
@@ -203,6 +228,64 @@ svg.appendChild(g)
 
 })
 
+/* =====================
+DIBUJAR CENTROIDES
+===================== */
+console.log("CENTROIDES:", app.centroides[metodo])
+Object.keys(app.centroides[metodo]).forEach(clusterId => {
+    clusterId = Number(clusterId) 
+    const item = obtenerMunicipioMasCercano(clusterId, metodo)
+    console.log("ITEM:", item)
+    if (!item) return
+
+    const loc = localidades.find(l => l.codigo === item.codigo)
+    if (!loc) return
+
+    const pathIndex = loc.paths?.[0]
+    if (!pathIndex) return
+
+    const path = svg.querySelector(`path[d="${trayectos[pathIndex-1]}"]`)
+    if (!path) return
+
+    const bbox = path.getBBox()
+
+    const cx = bbox.x + bbox.width / 2
+    const cy = bbox.y + bbox.height / 2
+
+    console.log("Centro:", cx, cy)
+
+    const circle = document.createElementNS(svgNS, "circle")
+
+    circle.setAttribute("cx", cx)
+    circle.setAttribute("cy", cy)
+    circle.setAttribute("r", 3)
+
+    circle.setAttribute("fill", app.colors[clusterId])
+    circle.setAttribute("stroke", "#000")
+    circle.setAttribute("stroke-width", "2")
+
+    const animate = document.createElementNS(svgNS, "animate")
+
+animate.setAttribute("attributeName", "r")
+animate.setAttribute("values", "3;6;3")
+animate.setAttribute("dur", "1.5s")
+animate.setAttribute("repeatCount", "indefinite")
+
+circle.appendChild(animate)
+
+const fade = document.createElementNS(svgNS, "animate")
+
+fade.setAttribute("attributeName", "opacity")
+fade.setAttribute("values", "1;0.3;1")
+fade.setAttribute("dur", "1.5s")
+fade.setAttribute("repeatCount", "indefinite")
+
+circle.appendChild(fade)
+
+    svg.appendChild(circle)
+
+})
+
 })
 
 }
@@ -221,4 +304,50 @@ const nb = Math.round(b + (255 - b) * factor)
 
 return `rgb(${nr},${ng},${nb})`
 
+}
+
+
+window.ajustarIntensidad = function(hex, intensidad) {
+
+     const r = parseInt(hex.substr(1,2),16)
+    const g = parseInt(hex.substr(3,2),16)
+    const b = parseInt(hex.substr(5,2),16)
+
+    // 🎯 color claro objetivo (NO blanco)
+    const boost  = 140   // puedes probar 180–220
+
+    // interpolación hacia gris claro
+    const nr = Math.min(255, r + boost * intensidad)
+    const ng = Math.min(255, g + boost * intensidad)
+    const nb = Math.min(255, b + boost * intensidad)
+
+    return `rgb(${nr},${ng},${nb})`
+}
+
+function obtenerMunicipioMasCercano(clusterId, metodo) {
+
+    clusterId = Number(clusterId)   // 🔥 MUY IMPORTANTE
+
+    const centroide = app.centroides[metodo][clusterId]
+
+    let mejor = null
+    let mejorDist = Infinity
+
+    const dataset = app.datasets[metodo]
+    const clusters = app.clusters[metodo]
+
+    dataset
+        .filter(d => clusters[d.codigo] === clusterId)
+        .forEach(d => {
+
+            const dist = distanciaEuclidea(d.vector, centroide)
+
+            if (dist < mejorDist) {
+                mejorDist = dist
+                mejor = d
+            }
+
+        })
+
+    return mejor
 }

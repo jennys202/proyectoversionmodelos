@@ -99,8 +99,33 @@ panel.appendChild(label)
 
 document.getElementById("eps").onchange = e=>{
 app.eps = parseFloat(e.target.value)
+app.recalcular()
 }
 
 document.getElementById("minPts").onchange = e=>{
 app.minPts = parseInt(e.target.value)
+app.recalcular()
 }
+
+// Variable global accesible desde otros archivos
+window.intensidad = 0.75;
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const slider = document.getElementById("sliderIntensidad");
+    const labelValor = document.getElementById("valorIntensidad");
+
+    if (!slider) {
+        console.error("❌ Slider no encontrado");
+        return;
+    }
+
+    slider.addEventListener("input", (e) => {
+        window.intensidad = parseFloat(e.target.value);
+        console.log("INTENSIDAD:", window.intensidad); // 👈 DEBUG
+        labelValor.textContent = window.intensidad.toFixed(2);
+       app.recalcular();
+       //dibujarMapas
+    });
+
+});

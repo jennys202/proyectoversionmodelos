@@ -13,7 +13,7 @@ app.colors=[
 app.selecciones = {}
 app.centroides={}
 
-app.modoColor = "cluster"
+app.modoColor = "centroide"
 
 app.algoritmo = "kmeans"
 

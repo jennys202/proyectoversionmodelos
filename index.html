@@ -51,8 +51,20 @@
   <div class="filterGroup">
     <label>Visualización</label>
     <div class="inline">
-      <label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label>
-      <label><input type="radio" name="modoColor" value="centroide"> Por centroide</label>
+      <!--<label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label> -->
+      <label><input type="radio" name="modoColor" value="centroide" checked> Por centroide</label>
+      <div>
+        <label>Intensidad de color:</label><br>
+        <input 
+          type="range" 
+          id="sliderIntensidad"
+          min="0.4" 
+          max="1" 
+          step="0.05" 
+          value="0.75"
+        >
+        <span id="valorIntensidad">0.75</span>
+      </div>
     </div>
   </div>
 
