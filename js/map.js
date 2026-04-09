@@ -36,12 +36,19 @@ mm:"Máximos y mínimos"
 
 title.textContent=nombres[metodo]
 
-card.appendChild(title)
+title.style.marginTop = "30px"
 
 const svg=document.createElementNS(svgNS,"svg")
-svg.setAttribute("viewBox","0 0 500 400")
+svg.setAttribute("viewBox","0 0 500 290")
+svg.setAttribute("width", "100%")
+svg.setAttribute("height", "600")
+svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
+svg.style.margin = "0 auto"
+svg.style.marginTop = "-120px"
 
+card.appendChild(title)
 card.appendChild(svg)
+
 
 container.appendChild(card)
 
@@ -116,25 +123,16 @@ if(d > maxDist) maxDist = d
 })
 
 const rawFactor = maxDist < 1e-6 ? 0 : dist / maxDist
+// limitar para evitar blanco
+const factorBase = Math.min(rawFactor, 0.7)
 
-const factor = Math.pow(rawFactor, 0.5)
+// slider (0 a 1)
+const intensidad = window.intensidad ?? 0.75
 
-/* aplicar aclarado */
+// invertir efecto: cuando intensidad=1 → factor=0
+const factor = factorBase * (1 - intensidad)
 
-//color = aclararColor(baseColor,factor)
-console.log("COLOR:", color)
-// intensidad del usuario (slider)
-const intensidad = window.intensidad || 0.75
-
-//garantizar que el centroide use color puro
-const factorFinal = Math.pow(factor, 0.4) * intensidad
-
-if (factor < 0.05) {
-    color = baseColor
-} else {
-    color = ajustarIntensidad(baseColor, factorFinal)
-}
-
+color = aclararColor(baseColor, factor)
 
 }
 
@@ -231,7 +229,7 @@ svg.appendChild(g)
 /* =====================
 DIBUJAR CENTROIDES
 ===================== */
-console.log("CENTROIDES:", app.centroides[metodo])/*
+console.log("CENTROIDES:", app.centroides[metodo])
 Object.keys(app.centroides[metodo]).forEach(clusterId => {
     clusterId = Number(clusterId) 
     const item = obtenerMunicipioMasCercano(clusterId, metodo)
@@ -262,8 +260,8 @@ Object.keys(app.centroides[metodo]).forEach(clusterId => {
 
     circle.setAttribute("fill", app.colors[clusterId])
     circle.setAttribute("stroke", "#000")
-    circle.setAttribute("stroke-width", "2")
-
+    circle.setAttribute("stroke-width", "1")
+/*
     const animate = document.createElementNS(svgNS, "animate")
 
 animate.setAttribute("attributeName", "r")
@@ -280,11 +278,11 @@ fade.setAttribute("values", "1;0.3;1")
 fade.setAttribute("dur", "1.5s")
 fade.setAttribute("repeatCount", "indefinite")
 
-circle.appendChild(fade)
+circle.appendChild(fade)*/
 
     svg.appendChild(circle)
 
-})*/
+})
 
 })
 
@@ -304,24 +302,6 @@ const nb = Math.round(b + (255 - b) * factor)
 
 return `rgb(${nr},${ng},${nb})`
 
-}
-
-
-window.ajustarIntensidad = function(hex, intensidad) {
-
-     const r = parseInt(hex.substr(1,2),16)
-    const g = parseInt(hex.substr(3,2),16)
-    const b = parseInt(hex.substr(5,2),16)
-
-    // 🎯 color claro objetivo (NO blanco)
-    const boost  = 140   // puedes probar 180–220
-
-    // interpolación hacia gris claro
-    const nr = Math.min(255, r + boost * intensidad)
-    const ng = Math.min(255, g + boost * intensidad)
-    const nb = Math.min(255, b + boost * intensidad)
-
-    return `rgb(${nr},${ng},${nb})`
 }
 
 function obtenerMunicipioMasCercano(clusterId, metodo) {

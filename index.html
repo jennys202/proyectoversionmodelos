@@ -32,13 +32,41 @@
 
 <div class="method-filter">
 
+  <div class="filterGroup">
+    <label>Algoritmo</label>
+    <div class="inline">
+      <label><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
+      <label><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
+      <label><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
+    </div>
+  </div>
+
+    <div class="filterGroup">
+    <label>Parámetros</label>
+    <div class="inline" id="params-k">
+      <label>
+        K:
+        <select id="selectorK">
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+    </label>
+    </div>
+    <div class="inline" id="params-dbscan">
+      <label>eps <input type="number" id="eps" step="0.01" value="0.15"></label>
+      <label>minPts <input type="number" id="minPts" value="3"></label>
+    </div>
+</div>
+
 <div class="filterGroup">
-    <label>Modelos</label>
+    <label>Normalización</label>
     <div class="inline">
         <label><input type="checkbox" class="methodCheck" value="corr" checked> Correlación</label>
-        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
         <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
         <label><input type="checkbox" class="methodCheck" value="mm"> Máximos y mínimos</label>
+        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
     </div>
 </div>
 
@@ -46,12 +74,25 @@
 <div class="filterGroup">
     <label>Colores</label>
     <div id="colorPanel" class="inline"></div>
+    <div>
+        <label>Intensidad de color:</label><br>
+        <input 
+          type="range" 
+          id="sliderIntensidad"
+          min="0" 
+          max="1" 
+          step="0.05" 
+          value="0.75"
+        >
+        <span id="valorIntensidad">0.75</span>
+      </div>
   </div>
-
+<!--
   <div class="filterGroup">
+    
     <label>Visualización</label>
     <div class="inline">
-      <!--<label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label> -->
+      <label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label> 
       <label><input type="radio" name="modoColor" value="centroide" checked> Por centroide</label>
       <div>
         <label>Intensidad de color:</label><br>
@@ -67,40 +108,7 @@
       </div>
     </div>
   </div>
-
-
-<div class="filterGroup">
-    <label>Algoritmo</label>
-    <div class="inline">
-      <label><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
-      <label><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
-      <label><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
-    </div>
-  </div>
-
-  <div class="filterGroup">
-    <label>KMEANS</label>
-    <div class="inline">
-      <label>
-        K:
-        <select id="selectorK">
-            <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-        </select>
-    </label>
-    </div>
-</div>
-
-<div class="filterGroup">
-    <label>DBSCAN</label>
-    <div class="inline">
-      <label>eps <input type="number" id="eps" step="0.01" value="0.15"></label>
-      <label>minPts <input type="number" id="minPts" value="3"></label>
-    </div>
-</div>
-
+-->
 
 </div>
 
@@ -109,11 +117,14 @@
 <div id="mapsContainer"></div>
 
 <div class="chart-container">
-<canvas id="chart"></canvas>
+  <div class="chart-wrapper">
+    <canvas id="chart"></canvas>
+  </div>
 </div>
 
 </div>
 
+</div>
 <div id="tooltip" class="tooltip"></div>
 
 </body>

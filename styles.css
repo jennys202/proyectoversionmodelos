@@ -1,15 +1,14 @@
 body{
 margin:0;
-padding:24px;
+padding:10px;
 font-family:system-ui;
 background:#f3f4f6;
 }
 
 .title{
 text-align:center;
-font-size:28px;
+font-size:25px;
 font-weight:700;
-margin-bottom:14px;
 }
 
 .controls{
@@ -25,57 +24,42 @@ margin-bottom:18px;
 }
 
 .method-filter{
-display:flex;
+display: grid;
+grid-template-columns: 1.1fr 1fr 1fr 1.2fr; 
 gap:14px;
 font-size:14px;
 }
 
 .panel{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:20px;
+  display: grid;
+  grid-template-columns: 60% 40%;
+  gap: 16px;
 }
 
 #mapsContainer{
-display:flex;
-flex-direction:column;
-gap:24px;
+width: 100%;
 }
 
-@media (max-width:900px){
-
-#mapsContainer{
-grid-template-columns:1fr;
+.chart-container{
+justify-content: center;
+width: 80%;
+height: 300px;
+margin-top: 80px;
 }
-
-}
-
-.mapCard{
-width:100%;
-background:white;
-border-radius:10px;
-padding:16px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
-}
-
 
 
 .mapTitle{
-text-align:center;
-font-weight:600;
-margin-bottom:6px;
+text-align: center;
+  font-weight: 700;
+  margin: 0;      
+  padding-bottom: 4px; 
 }
 
 svg{
 width:100%;
+vertical-align: top;
 }
 
-.chart-container{
-background:white;
-padding:10px;
-border-radius:8px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
 
 .tooltip{
 position:absolute;
@@ -107,6 +91,8 @@ display:flex;
 flex-direction:column;
 gap:6px;
 font-size:14px;
+padding: 10px 10px 10px 10px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .filterGroup label:first-child{
@@ -131,4 +117,15 @@ width:30px;
 height:30px;
 border:none;
 cursor:pointer;
+}
+
+#params-dbscan {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+#params-k {
+  display: flex;
+  align-items: center;
 }

@@ -107,6 +107,30 @@ app.minPts = parseInt(e.target.value)
 app.recalcular()
 }
 
+//mostrar parametros de acuerdo al modelo
+const radios = document.querySelectorAll('input[name="algoritmo"]');
+const paramsK = document.getElementById('params-k');
+const paramsDBSCAN = document.getElementById('params-dbscan');
+
+function actualizarParametros() {
+  const seleccionado = document.querySelector('input[name="algoritmo"]:checked').value;
+
+  if (seleccionado === 'dbscan') {
+    paramsK.style.display = 'none';
+    paramsDBSCAN.style.display = 'block';
+  } else {
+    paramsK.style.display = 'block';
+    paramsDBSCAN.style.display = 'none';
+  }
+}
+
+radios.forEach(radio => {
+  radio.addEventListener('change', actualizarParametros);
+});
+
+actualizarParametros();
+
+
 // Variable global accesible desde otros archivos
 window.intensidad = 0.75;
 
