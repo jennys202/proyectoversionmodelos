@@ -231,7 +231,7 @@ svg.appendChild(g)
 /* =====================
 DIBUJAR CENTROIDES
 ===================== */
-console.log("CENTROIDES:", app.centroides[metodo])
+console.log("CENTROIDES:", app.centroides[metodo])/*
 Object.keys(app.centroides[metodo]).forEach(clusterId => {
     clusterId = Number(clusterId) 
     const item = obtenerMunicipioMasCercano(clusterId, metodo)
@@ -284,7 +284,7 @@ circle.appendChild(fade)
 
     svg.appendChild(circle)
 
-})
+})*/
 
 })
 
