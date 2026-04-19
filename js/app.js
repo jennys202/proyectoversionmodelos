@@ -26,6 +26,7 @@ const metodos=metodosActivos()
 
 app.datasets={}
 app.clusters={}
+app.selecciones = {}
 
 metodos.forEach(m=>{
 
@@ -73,6 +74,12 @@ app.centroides[m]=res.centroides
 dibujarMapas()
 
 crearSelectorColores()
+
+actualizarChartsSegunAlgoritmo();
+
+if(Object.keys(app.selecciones).length > 0){
+  actualizarGrafico()
+}
 
 }
 

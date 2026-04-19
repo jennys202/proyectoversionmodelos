@@ -36,15 +36,15 @@ mm:"Máximos y mínimos"
 
 title.textContent=nombres[metodo]
 
-title.style.marginTop = "30px"
+title.style.marginTop = "5px"
 
 const svg=document.createElementNS(svgNS,"svg")
-svg.setAttribute("viewBox","0 0 500 290")
-svg.setAttribute("width", "100%")
-svg.setAttribute("height", "600")
+svg.setAttribute("viewBox","0 0 480 290")
+svg.setAttribute("width", "80%")
+svg.setAttribute("height", "550")
 svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
 svg.style.margin = "0 auto"
-svg.style.marginTop = "-120px"
+svg.style.marginTop = "-80px"
 
 card.appendChild(title)
 card.appendChild(svg)
@@ -219,6 +219,7 @@ p.setAttribute("stroke-width","2")
 })
 
 actualizarGrafico()
+actualizarChartsSegunAlgoritmo()
 
 })
 
@@ -229,7 +230,7 @@ svg.appendChild(g)
 /* =====================
 DIBUJAR CENTROIDES
 ===================== */
-console.log("CENTROIDES:", app.centroides[metodo])
+/*console.log("CENTROIDES:", app.centroides[metodo])
 Object.keys(app.centroides[metodo]).forEach(clusterId => {
     clusterId = Number(clusterId) 
     const item = obtenerMunicipioMasCercano(clusterId, metodo)
@@ -261,28 +262,11 @@ Object.keys(app.centroides[metodo]).forEach(clusterId => {
     circle.setAttribute("fill", app.colors[clusterId])
     circle.setAttribute("stroke", "#000")
     circle.setAttribute("stroke-width", "1")
-/*
-    const animate = document.createElementNS(svgNS, "animate")
 
-animate.setAttribute("attributeName", "r")
-animate.setAttribute("values", "3;6;3")
-animate.setAttribute("dur", "1.5s")
-animate.setAttribute("repeatCount", "indefinite")
-
-circle.appendChild(animate)
-
-const fade = document.createElementNS(svgNS, "animate")
-
-fade.setAttribute("attributeName", "opacity")
-fade.setAttribute("values", "1;0.3;1")
-fade.setAttribute("dur", "1.5s")
-fade.setAttribute("repeatCount", "indefinite")
-
-circle.appendChild(fade)*/
 
     svg.appendChild(circle)
 
-})
+})*/
 
 })
 
