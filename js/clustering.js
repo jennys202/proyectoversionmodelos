@@ -370,4 +370,36 @@ centroides:{} // no aplica
 
 }
 
+function detectarIslas(labelsMap, vecinos) {
+  const islas = [];
 
+  localidades.forEach(loc => {
+    const cod = loc.codigo;
+    const cluster = labelsMap[cod];
+
+    // Ignoramos si por alguna razón el municipio no tiene un cluster asignado
+    if (cluster === undefined) return;
+
+    const vec = vecinos[cod] || [];
+
+    // Si el municipio no tiene vecinos registrados, no podemos evaluarlo espacialmente
+    if (vec.length === 0) return;
+
+    let vecinosMismoCluster = 0;
+
+    // Evaluamos el cluster de cada vecino
+    vec.forEach(v => {
+      const clusterVecino = labelsMap[v];
+      if (clusterVecino === cluster) {
+        vecinosMismoCluster++;
+      }
+    });
+
+    //Condición de isla espacial: Ningún vecino colindante pertenece a su mismo cluster
+    if (vecinosMismoCluster === 0) {
+      islas.push(cod);
+    }
+  });
+
+  return islas;
+}

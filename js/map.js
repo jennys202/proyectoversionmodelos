@@ -11,7 +11,6 @@ const escalaCentroide=[
 ]
 
 function dibujarMapas(){
-   console.log("DIBUJANDO MAPAS") 
 
 const container=document.getElementById("mapsContainer")
 
@@ -72,7 +71,6 @@ if(app.algoritmo === "dbscan"){
 else{
     app.modoColor="centroide"
 }
-console.log("ANTES DE COLOR "+app.modoColor)
 
 if(cluster === -1){
 
@@ -94,7 +92,6 @@ COLOR POR CENTROIDE
 ===================== */
 
 else{
-    console.log("centroides ANTES DE COLOR")
     color = app.colors[cluster % app.colors.length]
 
 const baseColor = app.colors[cluster]
@@ -152,9 +149,22 @@ path.setAttribute("fill",color)
 path.setAttribute("stroke","#666")
 path.setAttribute("stroke-width","0.5")
 
+  // AQUÍ VA LA LÓGICA DE ISLAS
+const islasMetodo = app.islasPorMetodo?.[metodo] || []
+  const esIsla = islasMetodo.includes(loc.codigo)
+
+  if(app.mostrarIslas && esIsla){
+    path.setAttribute("stroke", "#000")
+    path.setAttribute("stroke-width", "2")
+    path.setAttribute("stroke-dasharray", "3,2")
+  }
+
+
+
 g.appendChild(path)
 
 })
+
 
 /* =====================
 TOOLTIP
@@ -314,4 +324,185 @@ function obtenerMunicipioMasCercano(clusterId, metodo) {
         })
 
     return mejor
+}
+
+function extraerPuntos(pathString){
+
+  const coords = []
+
+  const regex = /(-?\d+\.?\d*),(-?\d+\.?\d*)/g
+  let match
+
+  while((match = regex.exec(pathString)) !== null){
+    coords.push({
+      x: parseFloat(match[1]),
+      y: parseFloat(match[2])
+    })
+  }
+
+  return coords
+}
+
+function obtenerCentroide(pathString){
+
+  const puntos = extraerPuntos(pathString)
+
+  let x = 0, y = 0
+
+  puntos.forEach(p => {
+    x += p.x
+    y += p.y
+  })
+
+  return {
+    x: x / puntos.length,
+    y: y / puntos.length
+  }
+}
+
+function construirVecinos(){
+
+  const vecinos = {}
+  const centros = {}
+
+  // 1. calcular centroides
+  localidades.forEach(loc => {
+
+    const coords = []
+
+    loc.paths.forEach(idx => {
+      const path = trayectos[idx]
+      const centro = obtenerCentroide(path)
+      coords.push(centro)
+    })
+
+    const cx = coords.reduce((a,c)=>a+c.x,0) / coords.length
+    const cy = coords.reduce((a,c)=>a+c.y,0) / coords.length
+
+    centros[loc.codigo] = {x:cx, y:cy}
+  })
+
+  // 2. K vecinos más cercanos
+  const K = 20 
+
+  localidades.forEach(a => {
+
+    const distancias = []
+
+    localidades.forEach(b => {
+
+      if(a.codigo === b.codigo) return
+
+      const ca = centros[a.codigo]
+      const cb = centros[b.codigo]
+
+      const dist = Math.hypot(ca.x - cb.x, ca.y - cb.y)
+
+      distancias.push({
+        codigo: b.codigo,
+        dist: dist
+      })
+
+    })
+
+    // ordenar por distancia
+    distancias.sort((a,b)=>a.dist - b.dist)
+
+    // quedarse con los K más cercanos
+    //vecinos[a.codigo] = distancias.slice(0, K).map(d => d.codigo)
+
+    const K = 10
+const FACTOR = 1.8
+
+vecinos[a.codigo] = distancias
+  .slice(0, K)
+  .filter(d => d.dist <= distancias[0].dist * FACTOR)
+  .map(d => d.codigo)
+
+    if(a.codigo === "47001"){
+  console.log("Vecinos reales:", vecinos[a.codigo])
+}
+
+  })
+
+  return vecinos
+}
+
+
+
+function construirVecinosTopologicos(){
+
+  const vecinos = {}
+  const boxesMunicipios = {}
+
+  // SVG oculto reutilizable
+  let svgTemp = document.getElementById("svgTemp")
+
+  if(!svgTemp){
+    svgTemp = document.createElementNS("http://www.w3.org/2000/svg","svg")
+    svgTemp.setAttribute("id","svgTemp")
+    svgTemp.style.position = "absolute"
+    svgTemp.style.visibility = "hidden"
+    document.body.appendChild(svgTemp)
+  }
+
+  //PASO 1: calcular bounding boxes reales
+  localidades.forEach(loc => {
+
+    let minX = Infinity, minY = Infinity
+    let maxX = -Infinity, maxY = -Infinity
+
+    ;(loc.paths || []).forEach(i => {
+
+      const d = trayectos[i-1]
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path")
+      path.setAttribute("d", d)
+
+      svgTemp.appendChild(path)
+      const box = path.getBBox()
+      svgTemp.removeChild(path)
+
+      minX = Math.min(minX, box.x)
+      minY = Math.min(minY, box.y)
+      maxX = Math.max(maxX, box.x + box.width)
+      maxY = Math.max(maxY, box.y + box.height)
+    })
+
+    boxesMunicipios[loc.codigo] = {
+      x: minX,
+      y: minY,
+      width: maxX - minX,
+      height: maxY - minY
+    }
+
+    vecinos[loc.codigo] = []
+  })
+
+  //PASO 2: detectar vecinos por intersección
+  localidades.forEach(a => {
+
+    const boxA = boxesMunicipios[a.codigo]
+
+    localidades.forEach(b => {
+
+      if(a.codigo === b.codigo) return
+
+      const boxB = boxesMunicipios[b.codigo]
+
+      const intersecta =
+        boxA.x < boxB.x + boxB.width &&
+        boxA.x + boxA.width > boxB.x &&
+        boxA.y < boxB.y + boxB.height &&
+        boxA.y + boxA.height > boxB.y
+
+      if(intersecta){
+        vecinos[a.codigo].push(b.codigo)
+      }
+
+    })
+
+  })
+
+  return vecinos
 }

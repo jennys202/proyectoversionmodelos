@@ -19,6 +19,7 @@
 <script src="js/chart.js" defer></script>
 <script src="js/ui.js" defer></script>
 <script src="js/app.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
 </head>
 
@@ -55,7 +56,7 @@
     </label>
     </div>
     <div class="inline" id="params-dbscan">
-      <label>eps <input type="number" id="eps" step="0.01" value="0.15"></label>
+      <label>eps <input type="number" id="eps" step="0.01" value="0.5"></label>
       <label>minPts <input type="number" id="minPts" value="3"></label>
     </div>
 </div>
@@ -63,9 +64,9 @@
 <div class="filterGroup">
     <label>Normalización</label>
     <div class="inline">
-        <label><input type="checkbox" class="methodCheck" value="corr" checked> Correlación</label>
+        <label><input type="checkbox" class="methodCheck" value="mm" checked> Máximos y mínimos</label>
+        <label><input type="checkbox" class="methodCheck" value="corr"> Correlación</label>
         <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
-        <label><input type="checkbox" class="methodCheck" value="mm"> Máximos y mínimos</label>
         <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
     </div>
 </div>
@@ -86,6 +87,12 @@
         >
         <span id="valorIntensidad">0.75</span>
       </div>
+      <div>
+      <label>
+        <input type="checkbox" id="toggleIslas">
+        Enclaves Geograficos (islas)
+      </label>
+    </div>
   </div>
 <!--
   <div class="filterGroup">

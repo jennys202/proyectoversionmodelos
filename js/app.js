@@ -17,8 +17,10 @@ app.modoColor = "centroide"
 
 app.algoritmo = "kmeans"
 
-app.eps = 0.15
+app.eps = 0.5
 app.minPts = 3
+
+app.mostrarIslas = false
 
 app.recalcular=function(){
 
@@ -27,6 +29,8 @@ const metodos=metodosActivos()
 app.datasets={}
 app.clusters={}
 app.selecciones = {}
+app.labelsPorMetodo = {}
+app.islasPorMetodo = {}
 
 metodos.forEach(m=>{
 
@@ -66,11 +70,41 @@ res = kmedoids(app.datasets[m],app.k,distanciaEuclidea)
 
 }
 
+const toggle = document.getElementById("toggleIslas")
+
+if(app.algoritmo === "dbscan"){
+  toggle.checked = false
+  toggle.disabled = true
+  app.mostrarIslas = false
+}else{
+  toggle.disabled = false
+}
+
 app.clusters[m]=res.clusters
 app.centroides[m]=res.centroides
+app.labelsPorMetodo[m] = res.clusters
+
+if(m === metodos[0]){
+  app.labelsMap = res.clusters
+}
 
 })
 
+// PRIMERO calcular vecinos + islas
+if(app.mostrarIslas && metodos){
+    app.vecinos = construirVecinosTopologicos()
+    metodos.forEach(m => {
+    app.islasPorMetodo[m] = detectarIslas(
+        app.labelsPorMetodo[m],
+        app.vecinos
+    )
+    })
+    console.log("Islas por método:", app.islasPorMetodo)
+}else{
+    app.vecinos  = []
+    app.islasPorMetodo = []
+}
+//  DESPUÉS dibujar
 dibujarMapas()
 
 crearSelectorColores()
@@ -87,6 +121,13 @@ document.getElementById("selectorK").onchange=e=>{
 
 app.k=parseInt(e.target.value)
 app.recalcular()
+
+}
+
+document.getElementById("toggleIslas").onchange = (e) => {
+
+  app.mostrarIslas = e.target.checked
+  app.recalcular() 
 
 }
 
