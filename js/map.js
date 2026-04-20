@@ -16,7 +16,10 @@ const container=document.getElementById("mapsContainer")
 
 container.innerHTML=""
 
-const metodos=metodosActivos()
+const metodos=metodosActivos();
+
+// Asignamos una clase dinámica según la cantidad de mapas (layout-1, layout-2, etc.)
+    container.className = "layout-" + metodos.length;
 
 metodos.forEach(metodo=>{
 
@@ -37,16 +40,18 @@ title.textContent=nombres[metodo]
 
 title.style.marginTop = "5px"
 
-const svg=document.createElementNS(svgNS,"svg")
-svg.setAttribute("viewBox","0 0 480 290")
-svg.setAttribute("width", "80%")
-svg.setAttribute("height", "550")
-svg.setAttribute("preserveAspectRatio", "xMidYMid meet")
-svg.style.margin = "0 auto"
-svg.style.marginTop = "-80px"
+const svg = document.createElementNS(svgNS, "svg");
+        
+        // Ajustamos el viewBox para que no recorte los bordes de la provincia
+        svg.setAttribute("viewBox", "-30 15 570 335"); 
+        svg.setAttribute("preserveAspectRatio", "xMidYMin meet");
+        
+        svg.style.width = "100%";
+        svg.style.height = "100%";
+        svg.style.margin = "0";
 
-card.appendChild(title)
-card.appendChild(svg)
+        card.appendChild(title);
+        card.appendChild(svg);
 
 
 container.appendChild(card)
