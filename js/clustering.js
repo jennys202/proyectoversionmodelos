@@ -137,52 +137,109 @@ centroides
 
 }
 
-function silhouette(dataset,clusters){
+function silhouette(
+    dataset,
+    clusters,
+    distancia
+){
 
-let total=0
+    const valores = [];
 
-dataset.forEach(p=>{
+    dataset.forEach(p => {
 
-const ci=clusters[p.codigo]
+        const clusterActual = clusters[p.codigo];
 
-const mismo=dataset.filter(
-d=>clusters[d.codigo]===ci && d.codigo!==p.codigo
-)
+        // Ignorar ruido DBSCAN
+        if(clusterActual === -1 || clusterActual === undefined)
+            return;
 
-let a=0
+        // Municipios del mismo cluster
+        const mismoCluster = dataset.filter(
+            d =>
+                clusters[d.codigo] === clusterActual &&
+                d.codigo !== p.codigo
+        );
 
-if(mismo.length){
+        // a(i): distancia media dentro del cluster
+        let a = 0;
 
-a=mismo
-.map(d=>distancia(p.vector,d.vector))
-.reduce((s,v)=>s+v,0)/mismo.length
+        if(mismoCluster.length > 0){
 
-}
+            mismoCluster.forEach(d => {
 
-let b=Infinity
+                a += distancia(
+                    p.vector,
+                    d.vector
+                );
 
-const otros=[...new Set(Object.values(clusters))]
-.filter(c=>c!==ci)
+            });
 
-otros.forEach(c=>{
+            a /= mismoCluster.length;
 
-const grupo=dataset.filter(
-d=>clusters[d.codigo]===c
-)
+        }
 
-const dist=grupo
-.map(d=>distancia(p.vector,d.vector))
-.reduce((s,v)=>s+v,0)/grupo.length
+        // Obtener clusters distintos
+        const otrosClusters = [
+            ...new Set(
+                Object.values(clusters)
+            )
+        ].filter(
+            c => c !== clusterActual && c !== -1
+        );
 
-b=Math.min(b,dist)
+        // b(i): distancia media mínima al cluster más cercano
+        let b = Infinity;
 
-})
+        otrosClusters.forEach(c => {
 
-total+=(b-a)/Math.max(a,b)
+            const miembros = dataset.filter(
+                d => clusters[d.codigo] === c
+            );
 
-})
+            if(!miembros.length)
+                return;
 
-return total/dataset.length
+            let distMedia = 0;
+
+            miembros.forEach(d => {
+
+                distMedia += distancia(
+                    p.vector,
+                    d.vector
+                );
+
+            });
+
+            distMedia /= miembros.length;
+
+            if(distMedia < b)
+                b = distMedia;
+
+        });
+
+        // Evitar divisiones por cero
+        if(b === Infinity)
+            return;
+
+        const s =
+            (b - a) /
+            Math.max(a, b);
+
+        valores.push(s);
+
+    });
+
+    // Silhouette global
+    if(!valores.length)
+        return 0;
+
+    return (
+        valores.reduce(
+            (sum, v) => sum + v,
+            0
+        ) / valores.length
+    );
+
 }
 
 function mejorK(dataset){
@@ -402,4 +459,104 @@ function detectarIslas(labelsMap, vecinos) {
   });
 
   return islas;
+}
+
+function calcularEMA(dataset, clusters, centroides, distancia){
+
+    let suma = 0;
+    let total = 0;
+
+    dataset.forEach(p => {
+
+        const cluster = clusters[p.codigo];
+
+        // Ignorar ruido DBSCAN
+        if(cluster === -1 || cluster === undefined) return;
+
+        const representante = centroides[cluster];
+
+        suma += distancia(
+            p.vector,
+            representante
+        );
+
+        total++;
+
+    });
+
+    return total > 0
+        ? suma / total
+        : 0;
+
+}
+
+function calcularCT(labelsMap, vecinos){
+
+    let municipiosTotales = 0;
+    let municipiosCoherentes = 0;
+
+    localidades.forEach(loc => {
+
+        const cod = loc.codigo;
+
+        const cluster = labelsMap[cod];
+
+        if(cluster === undefined)
+            return;
+
+        municipiosTotales++;
+
+        const vec = vecinos[cod] || [];
+
+        let tieneVecinoMismoCluster = false;
+
+        vec.forEach(v => {
+
+            if(labelsMap[v] === cluster){
+
+                tieneVecinoMismoCluster = true;
+
+            }
+
+        });
+
+        if(tieneVecinoMismoCluster){
+
+            municipiosCoherentes++;
+
+        }
+
+    });
+
+    return (
+        municipiosCoherentes /
+        municipiosTotales
+    ) * 100;
+
+}
+
+function resumenClusters(clusters){
+
+    const conteo = {};
+    let ruido = 0;
+
+    Object.values(clusters).forEach(cluster => {
+
+        if(cluster === -1){
+
+            ruido++;
+            return;
+
+        }
+
+        conteo[cluster] =
+            (conteo[cluster] || 0) + 1;
+
+    });
+
+    return {
+        clusters: conteo,
+        ruido
+    };
+
 }
