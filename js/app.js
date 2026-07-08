@@ -1,6 +1,6 @@
 const app={}
 
-app.k=3
+app.k=4
 
 app.colors=[
 "#1f77b4",
@@ -22,6 +22,8 @@ app.modoColor = "centroide"
 
 app.algoritmo = "kmeans"
 
+app.distancia = "euclidean"
+
 app.eps = 0.5
 app.minPts = 3
 
@@ -30,6 +32,11 @@ app.mostrarIslas = false
 app.recalcular=function(){
 
 const metodos=metodosActivos()
+
+const distanciaActual =
+    app.distancia === "pearson"
+        ? distanciaCorrelacion
+        : distanciaEuclidea;
 
 app.datasets={}
 app.clusters={}
@@ -44,34 +51,34 @@ app.datasets[m]=construirDataset(m)
 let res
 
 if(app.algoritmo === "kmeans"){
-if(m==="corr")
-res=kmeans(app.datasets[m],app.k,distanciaCorrelacion)
 
-if(m==="z")
-res=kmeans(app.datasets[m],app.k,distanciaEuclidea)
-
-if(m==="rel")
-res=kmeans(app.datasets[m],app.k,distanciaEuclidea)
-
-if(m==="mm")
-res=kmeans(app.datasets[m],app.k,distanciaEuclidea)
+res =
+kmeans(
+app.datasets[m],
+app.k,
+distanciaActual
+)
 }
+
 else if(app.algoritmo === "dbscan"){
 
-if(m==="corr")
-res = dbscan(app.datasets[m],app.eps,app.minPts,distanciaCorrelacion)
-
-else
-res = dbscan(app.datasets[m],app.eps,app.minPts,distanciaEuclidea)
+res =
+dbscan(
+app.datasets[m],
+app.eps,
+app.minPts,
+distanciaActual
+)
 
 }
 else{
 
-if(m==="corr")
-res = kmedoids(app.datasets[m],app.k,distanciaCorrelacion)
-
-else
-res = kmedoids(app.datasets[m],app.k,distanciaEuclidea)
+res =
+kmedoids(
+app.datasets[m],
+app.k,
+distanciaActual
+)
 
 }
 
@@ -118,18 +125,12 @@ if(resumen.ruido > 0){
 
 
 const nombres = {
+     original:"Original",
     mm:"MaxMin",
     z:"ZScore",
-    rel:"Relativo",
-    corr:"Correlacion"
+    rel:"Relativo"
 };
 
-let distanciaActual;
-
-if(m === "corr")
-    distanciaActual = distanciaCorrelacion;
-else
-    distanciaActual = distanciaEuclidea;
 
 let ema = null;
 
@@ -247,17 +248,17 @@ function exportarTodosLosK(){
     ];
 
     const metodos = [
-        "mm",
-        "z",
-        "rel",
-        "corr"
+    "original",
+    "mm",
+    "z",
+    "rel"
     ];
 
     const nombresMetodo = {
-        mm: "MaxMin",
-        z: "ZScore",
-        rel: "Relativo",
-        corr: "Correlacion"
+       original:"Original",
+        mm:"MaxMin",
+        z:"ZScore",
+        rel:"Relativo"
     };
 
     const vecinos =
@@ -270,10 +271,6 @@ function exportarTodosLosK(){
             const dataset =
                 construirDataset(m);
 
-            const distanciaActual =
-                m === "corr"
-                    ? distanciaCorrelacion
-                    : distanciaEuclidea;
 
             for(let k=2; k<=10; k++){
 
@@ -282,32 +279,20 @@ function exportarTodosLosK(){
                 if(algoritmo === "kmeans"){
 
                     resultado =
-                        m === "corr"
-                        ? kmeans(
+                        kmeans(
                             dataset,
                             k,
-                            distanciaCorrelacion
-                        )
-                        : kmeans(
-                            dataset,
-                            k,
-                            distanciaEuclidea
+                            distanciaActual
                         );
 
                 }
                 else{
 
                     resultado =
-                        m === "corr"
-                        ? kmedoids(
+                         kmedoids(
                             dataset,
                             k,
-                            distanciaCorrelacion
-                        )
-                        : kmedoids(
-                            dataset,
-                            k,
-                            distanciaEuclidea
+                            distanciaActual
                         );
 
                 }

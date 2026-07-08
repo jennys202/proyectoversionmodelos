@@ -97,6 +97,11 @@ panel.appendChild(label)
 
 }
 
+ const pearson =
+document.querySelector(
+'input[value="pearson"]'
+);
+
 document.getElementById("eps").onchange = e=>{
 app.eps = parseFloat(e.target.value)
 app.recalcular()
@@ -106,6 +111,20 @@ document.getElementById("minPts").onchange = e=>{
 app.minPts = parseInt(e.target.value)
 app.recalcular()
 }
+
+document
+.querySelectorAll('input[name="distancia"]')
+.forEach(r=>{
+
+    r.onchange = e=>{
+
+        app.distancia = e.target.value
+
+        app.recalcular()
+
+    }
+
+})
 
 //mostrar parametros de acuerdo al modelo
 const radios = document.querySelectorAll('input[name="algoritmo"]');
@@ -122,7 +141,31 @@ function actualizarParametros() {
     paramsK.style.display = 'block';
     paramsDBSCAN.style.display = 'none';
   }
+
+ const euclidea = document.querySelector(
+    'input[value="euclidean"]'
+);
+
+const pearson = document.querySelector(
+    'input[value="pearson"]'
+);
+
+if (seleccionado === "kmeans") {
+    // Si Pearson estaba seleccionado, cambiar primero a Euclídea
+    if (pearson.checked) {
+        euclidea.checked = true;
+        app.distancia = "euclidean";
+        app.recalcular();
+    }
+    pearson.disabled = true;
+} else {
+    pearson.disabled = false;
 }
+
+ 
+}
+
+
 
 radios.forEach(radio => {
   radio.addEventListener('change', actualizarParametros);

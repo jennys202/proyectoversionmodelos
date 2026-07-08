@@ -63,9 +63,24 @@ let serie=Object.values(
 poblacionHistorica[loc.codigo].datos
 ).map(Number)
 
-if(tipo==="z") serie=normalizarZ(serie)
-if(tipo==="rel") serie=relativo(serie)
-if(tipo==="mm") serie=maxmin(serie)
+switch(tipo){
+
+    case "original":
+        break;
+
+    case "mm":
+        serie = maxmin(serie);
+        break;
+
+    case "z":
+        serie = normalizarZ(serie);
+        break;
+
+    case "rel":
+        serie = relativo(serie);
+        break;
+
+}
 
 return{
 codigo:loc.codigo,

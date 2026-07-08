@@ -7,8 +7,8 @@ background:#f3f4f6;
 
 .title{
 text-align:center;
-font-size:20px;
-font-weight:700;
+font-size:22px;
+font-weight:750;
 margin-bottom:8px;
 margin-top: 5px;
 }
@@ -27,11 +27,16 @@ height: auto;
 }
 
 .method-filter{
-display: grid;
-grid-template-columns: 1.1fr 1fr 1fr 1.2fr; 
-background-color: white;
-gap:8px;
-font-size:12px;
+    display:grid;
+      grid-template-columns:
+        minmax(220px,1fr)
+        minmax(220px,1fr)
+        minmax(220px,1fr)
+        minmax(220px,1fr)
+        minmax(360px,1.2fr);
+    gap:10px;
+    align-items:stretch;
+    font-size:12px;
 }
 
 .panel {
@@ -44,9 +49,10 @@ font-size:12px;
 /* Contenedor de los mapas: Cuadrícula 2x2 */
 #mapsContainer {
   display: grid;
-  gap: 15px;
   width: 100%;
   height: 100%;
+  column-gap:5px; 
+  row-gap:2px;    
 }
 
 #mapsContainer.layout-1 {
@@ -69,7 +75,7 @@ font-size:12px;
 
 /* Tarjeta de cada mapa */
 .mapCard {
-  padding: 10px;
+  padding: 5px;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -156,18 +162,29 @@ margin-bottom:20px;
 }
 
 .filterGroup{
-display:flex;
-flex-direction:column;
-gap:4px;
-font-size:12px;
-padding: 6px 6px 6px 6px;
-box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    gap:2px;
+
+    padding:10px;
+
+    min-height:110px;
+
+    background:#fff;
+    border:1px solid #ddd;
+    border-radius:4px;
+
+    box-shadow:0 2px 4px rgba(0,0,0,.15);
+
+    box-sizing:border-box;
 }
 
-.filterGroup label:first-child{
-font-weight:600;
-font-size:12px;
-color:#333;
+.filterGroup > label:first-child{
+    font-weight:700;
+    font-size:14px;
+    color:#333;
+    margin-bottom:4px;
 }
 
 .inline{
@@ -199,4 +216,29 @@ cursor:pointer;
 #params-k {
   display: flex;
   align-items: center;
+}
+
+.options-list{
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    gap:2px;
+}
+
+.options-list label{
+    display:flex;
+    align-items:center;
+    gap:2px;
+    font-size:12px;
+}
+
+.toggleIslasMapa{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:700;
+    white-space:nowrap;
+    padding:4px 8px;
+    width:975px;
 }

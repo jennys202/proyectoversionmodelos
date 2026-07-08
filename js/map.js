@@ -30,10 +30,10 @@ const title=document.createElement("div")
 title.className="mapTitle"
 
 const nombres={
-corr:"Correlación",
+original:"Datos originales",
+mm:"Máximos y mínimos",
 z:"Z-Score",
-rel:"Crecimiento relativo",
-mm:"Máximos y mínimos"
+rel:"Crecimiento relativo"
 }
 
 title.textContent=nombres[metodo]
@@ -241,47 +241,6 @@ actualizarChartsSegunAlgoritmo()
 svg.appendChild(g)
 
 })
-
-/* =====================
-DIBUJAR CENTROIDES
-===================== */
-/*console.log("CENTROIDES:", app.centroides[metodo])
-Object.keys(app.centroides[metodo]).forEach(clusterId => {
-    clusterId = Number(clusterId) 
-    const item = obtenerMunicipioMasCercano(clusterId, metodo)
-    console.log("ITEM:", item)
-    if (!item) return
-
-    const loc = localidades.find(l => l.codigo === item.codigo)
-    if (!loc) return
-
-    const pathIndex = loc.paths?.[0]
-    if (!pathIndex) return
-
-    const path = svg.querySelector(`path[d="${trayectos[pathIndex-1]}"]`)
-    if (!path) return
-
-    const bbox = path.getBBox()
-
-    const cx = bbox.x + bbox.width / 2
-    const cy = bbox.y + bbox.height / 2
-
-    console.log("Centro:", cx, cy)
-
-    const circle = document.createElementNS(svgNS, "circle")
-
-    circle.setAttribute("cx", cx)
-    circle.setAttribute("cy", cy)
-    circle.setAttribute("r", 3)
-
-    circle.setAttribute("fill", app.colors[clusterId])
-    circle.setAttribute("stroke", "#000")
-    circle.setAttribute("stroke-width", "1")
-
-
-    svg.appendChild(circle)
-
-})*/
 
 })
 

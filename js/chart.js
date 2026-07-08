@@ -45,14 +45,29 @@ datasets
 options:{
   responsive:true,
   maintainAspectRatio:false,
+     layout:{
+        padding:{
+            top:10
+        }
+    },
   plugins:{
     title:{
       display: true,
       text: "Municipio "
     },
     legend:{
-      position: "top"
+    position:"top",
+    align:"center",
+
+    labels:{
+        boxWidth:14,
+        boxHeight:14,
+        padding:3,
+        font:{
+            size:8
+        }
     }
+}
   }
 }
 
@@ -136,6 +151,19 @@ if(centroide){
 if(window.chartClusters && typeof window.chartClusters.destroy === "function"){
   window.chartClusters.destroy()
 }
+// Ajustar la altura del gráfico según el número de centroides
+const k = datasetsChart.length;
+
+const contenedor = document.getElementById("clusterChartContainer");
+
+let altura = 220;
+
+if(k >= 6) altura = 280;
+if(k >= 8) altura = 330;
+if(k >= 10) altura = 380;
+
+contenedor.style.height = altura + "px";
+
 window.chartClusters = new Chart(
   document.getElementById("chartClusters"),
   {
@@ -147,13 +175,29 @@ window.chartClusters = new Chart(
     options:{
     responsive:true,
     maintainAspectRatio:false,
+     layout:{
+        padding:{
+            top:15
+        }
+    },
     plugins:{
         title:{
         display: true,
-        text: "Patrones de referencia"
+        text: "Patrones de referencia",
+        padding:{
+                bottom:10
+            }
         },
         legend:{
-        position: "top"
+        position: "top",
+        labels:{
+                boxWidth:18,
+                boxHeight:18,
+                padding:12,
+                font:{
+                    size:11
+                }
+            }
         }
     }
     }

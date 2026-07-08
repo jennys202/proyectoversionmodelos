@@ -36,13 +36,32 @@
 <div class="method-filter">
 
   <div class="filterGroup">
+    <label>Transformación de la serie</label>
+    <div class="options-list">
+        <label><input type="checkbox" class="methodCheck" value="original" checked>Datos originales</label>
+        <label><input type="checkbox" class="methodCheck" value="mm" > Máximos y mínimos</label>
+        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
+        <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
+    </div>
+</div>
+
+  <div class="filterGroup">
     <label>Algoritmo</label>
-    <div class="inline">
+    <div class="options-list">
       <label><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
       <label><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
       <label><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
     </div>
   </div>
+
+    <div class="filterGroup">
+    <label>Metrica de distancia</label>
+    <div class="options-list">
+        <label><input type="radio" name="distancia" value="euclidean" checked> Distancia euclídea</label>
+        <label><input type="radio" name="distancia" value="pearson"> Correlación de Pearson</label>
+    </div>
+</div>
+
 
     <div class="filterGroup">
     <label>Parámetros</label>
@@ -51,8 +70,8 @@
         K:
         <select id="selectorK">
             <option value="2">2</option>
-            <option value="3" selected>3</option>
-            <option value="4">4</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
             <option value="5">5</option>
             <option value="6">6</option>
             <option value="7">7</option>
@@ -62,22 +81,12 @@
         </select>
     </label>
     <button id="btnExportar">
-    Exportar todos los K
+    Exportar K
 </button>
     </div>
     <div class="inline" id="params-dbscan">
       <label>eps <input type="number" id="eps" step="0.01" value="0.5"></label>
       <label>minPts <input type="number" id="minPts" value="3"></label>
-    </div>
-</div>
-
-<div class="filterGroup">
-    <label>Normalización</label>
-    <div class="inline">
-        <label><input type="checkbox" class="methodCheck" value="mm" checked> Máximos y mínimos</label>
-        <label><input type="checkbox" class="methodCheck" value="corr"> Correlación</label>
-        <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
-        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
     </div>
 </div>
 
@@ -97,12 +106,6 @@
         >
         <span id="valorIntensidad">0.75</span>
       </div>
-      <div>
-      <label>
-        <input type="checkbox" id="toggleIslas">
-        Enclaves Geograficos (islas)
-      </label>
-    </div>
   </div>
 <!--
   <div class="filterGroup">
@@ -128,6 +131,12 @@
 -->
 
 </div>
+  <div class="maps-toolbar">
+        <label class="toggleIslasMapa">
+            <input type="checkbox" id="toggleIslas">
+            Mostrar enclaves geográficos (islas)
+        </label>
+    </div>
 
 <div class="panel">
 
