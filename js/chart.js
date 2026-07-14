@@ -15,15 +15,24 @@ Object.entries(app.selecciones).forEach(([metodo,codigo])=>{
 
 const datos = poblacionHistorica[codigo]
 
+// Cluster al que pertenece el municipio
+const cluster = app.clusters[metodo][codigo];
+
+// Color del cluster
+const color = app.colors[cluster] || "#1976D2";
+
 datasets.push({
-
-label: datos.nombre,
-
-data: Object.values(datos.datos),
-
-fill:false,
-borderWidth:2
-
+    label: `${datos.nombre} (C${cluster})`,
+    data: Object.values(datos.datos),
+    fill:false,
+    borderWidth:1,
+    borderColor: color,
+    backgroundColor: color,
+    pointBackgroundColor: color,
+    pointBorderColor: color,
+    pointRadius:4,
+    pointHoverRadius:6,
+    tension:0.25
 })
 
 })
