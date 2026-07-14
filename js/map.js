@@ -29,9 +29,20 @@ metodos.forEach(metodo=>{
 
 const card = document.createElement("div");
 card.className = "map-card maps-" + metodos.length;
+card.dataset.metodo = metodo;
 
 const title = document.createElement("div");
 title.className = "map-title";
+
+title.style.cursor = "pointer";
+
+title.addEventListener("click",(e)=>{
+
+    e.stopPropagation();
+
+    seleccionarMapa(metodo);
+
+});
 
 const nombres={
 original:"Datos originales",
@@ -63,6 +74,12 @@ card.appendChild(mapContainer);
 
 
 container.appendChild(card)
+
+if(app.mapaActivo===metodo){
+
+    card.classList.add("map-active");
+
+}
 
 const clusters=app.clusters[metodo]
 const centroides=app.centroides[metodo]
@@ -242,6 +259,7 @@ p.setAttribute("stroke-width","2")
 })
 
 app.metodoActivo = metodo;
+actualizarMapaActivo();
 actualizarPanelMetricas();
 
 actualizarGrafico()
@@ -480,4 +498,39 @@ function construirVecinosTopologicos(){
   })
 
   return vecinos
+}
+
+function seleccionarMapa(metodo){
+
+    app.mapaActivo = metodo;
+
+    actualizarPanelMetricas();
+
+    actualizarChartsSegunAlgoritmo();
+
+
+    actualizarMapaActivo();
+
+}
+
+function actualizarMapaActivo(){
+
+    document
+        .querySelectorAll(".map-card")
+        .forEach(card=>{
+
+            card.classList.remove("map-active");
+
+        });
+
+    const activo=document.querySelector(
+        `.map-card[data-metodo="${app.mapaActivo}"]`
+    );
+
+    if(activo){
+
+        activo.classList.add("map-active");
+
+    }
+
 }

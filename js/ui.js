@@ -204,7 +204,7 @@ function actualizarPanelMetricas(){
     if(metodos.length === 0)
         return;
 
-    const metodo = app.metodoActivo || metodos[0];
+   const metodo = app.mapaActivo || metodos[0];
 
     const m = app.metricas[metodo];
 

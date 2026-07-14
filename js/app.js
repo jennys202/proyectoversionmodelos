@@ -35,6 +35,14 @@ app.recalcular=function(){
 
 const metodos=metodosActivos()
 
+if (
+    app.mapaActivo === null ||
+    app.mapaActivo === undefined ||
+    !metodos.includes(app.mapaActivo)
+) {
+    app.mapaActivo = metodos[0];
+}
+
 const distanciaActual =
     app.distancia === "pearson"
         ? distanciaCorrelacion

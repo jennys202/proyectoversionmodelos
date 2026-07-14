@@ -73,7 +73,7 @@ options:{
 
 function actualizarGraficoClusters(){
 
-const metodo = Object.keys(app.clusters)[0]  // puedes mejorar luego
+const metodo = app.mapaActivo;
 const clusters = app.clusters[metodo]
 const dataset = app.datasets[metodo]
 
@@ -190,7 +190,7 @@ window.chartClusters = new Chart(
 
 function actualizarGraficoDBSCAN(){
 
-  const metodo = Object.keys(app.clusters)[0]
+  const metodo = app.mapaActivo;
   const clusters = app.clusters[metodo]
 
   const conteo = {}
