@@ -106,7 +106,7 @@ let min=Infinity
 
 centroides.forEach((c,i)=>{
 
-const d = distancia(p.vector,c)
+const d = distanciaEuclidea(p.vector,c)
 
 if(d<min){
 min=d
@@ -158,6 +158,11 @@ function silhouette(
     distancia
 ){
 
+    let distanciaAct =
+    app.distancia === "pearson"
+        ? distanciaCorrelacion
+        : distanciaEuclidea;
+
     const valores = [];
 
     dataset.forEach(p => {
@@ -182,7 +187,7 @@ function silhouette(
 
             mismoCluster.forEach(d => {
 
-                a += distancia(
+                a += distanciaAct(
                     p.vector,
                     d.vector
                 );
@@ -218,7 +223,7 @@ function silhouette(
 
             miembros.forEach(d => {
 
-                distMedia += distancia(
+                distMedia += distanciaAct(
                     p.vector,
                     d.vector
                 );
@@ -301,6 +306,11 @@ let medoids = dataset.slice(0,k).map(d=>d.vector)
 
 let clusters = {}
 
+let distanciaAct =
+    app.distancia === "pearson"
+        ? distanciaCorrelacion
+        : distanciaEuclidea;
+
 for(let iter=0;iter<10;iter++){
 
 /* asignación */
@@ -312,7 +322,7 @@ let distMin=Infinity
 
 medoids.forEach((m,i)=>{
 
-const d = distancia(p.vector,m)
+const d = distanciaAct(p.vector,m)
 
 if(d < distMin){
 distMin = d
@@ -344,7 +354,7 @@ let coste = 0
 
 miembros.forEach(m=>{
 
-coste += distancia(candidato.vector,m.vector)
+coste += distanciaAct(candidato.vector,m.vector)
 
 })
 
@@ -481,6 +491,11 @@ function calcularEMA(dataset, clusters, centroides, distancia){
     let suma = 0;
     let total = 0;
 
+    let distanciaAct =
+    app.distancia === "pearson"
+        ? distanciaCorrelacion
+        : distanciaEuclidea;
+
     dataset.forEach(p => {
 
         const cluster = clusters[p.codigo];
@@ -490,7 +505,7 @@ function calcularEMA(dataset, clusters, centroides, distancia){
 
         const representante = centroides[cluster];
 
-        suma += distancia(
+        suma += distanciaAct(
             p.vector,
             representante
         );

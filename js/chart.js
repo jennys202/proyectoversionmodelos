@@ -47,26 +47,13 @@ options:{
   maintainAspectRatio:false,
      layout:{
         padding:{
-            top:10
+            top:15
         }
     },
   plugins:{
-    title:{
-      display: true,
-      text: "Municipio "
-    },
     legend:{
     position:"top",
     align:"center",
-
-    labels:{
-        boxWidth:14,
-        boxHeight:14,
-        padding:3,
-        font:{
-            size:8
-        }
-    }
 }
   }
 }
@@ -135,7 +122,7 @@ Object.entries(seriesPorCluster).forEach(([cluster, series]) => {
 if(centroide){
 
   datasetsChart.push({
-    label: "Centroide " + cluster,
+    label: "C" + cluster,
     data: centroide,
     borderColor: app.colors[cluster],
     backgroundColor: app.colors[cluster],
@@ -156,13 +143,6 @@ const k = datasetsChart.length;
 
 const contenedor = document.getElementById("clusterChartContainer");
 
-let altura = 220;
-
-if(k >= 6) altura = 280;
-if(k >= 8) altura = 330;
-if(k >= 10) altura = 380;
-
-contenedor.style.height = altura + "px";
 
 window.chartClusters = new Chart(
   document.getElementById("chartClusters"),
@@ -181,19 +161,12 @@ window.chartClusters = new Chart(
         }
     },
     plugins:{
-        title:{
-        display: true,
-        text: "Patrones de referencia",
-        padding:{
-                bottom:10
-            }
-        },
         legend:{
         position: "top",
         labels:{
-                boxWidth:18,
-                boxHeight:18,
-                padding:12,
+                boxWidth:14,
+                boxHeight:10,
+                padding:8,
                 font:{
                     size:11
                 }

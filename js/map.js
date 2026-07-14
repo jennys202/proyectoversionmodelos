@@ -12,22 +12,26 @@ const escalaCentroide=[
 
 function dibujarMapas(){
 
-const container=document.getElementById("mapsContainer")
+    const container = document.getElementById("mapsGrid");
 
-container.innerHTML=""
+    if(!container){
+        console.error("No existe mapsGrid");
+        return;
+    }
 
-const metodos=metodosActivos();
+    container.innerHTML = "";
 
-// Asignamos una clase dinámica según la cantidad de mapas (layout-1, layout-2, etc.)
-    container.className = "layout-" + metodos.length;
+    const metodos = metodosActivos();
+
+    container.className = "maps-grid maps-" + metodos.length;
 
 metodos.forEach(metodo=>{
 
-const card=document.createElement("div")
-card.className="mapCard"
+const card = document.createElement("div");
+card.className = "map-card maps-" + metodos.length;
 
-const title=document.createElement("div")
-title.className="mapTitle"
+const title = document.createElement("div");
+title.className = "map-title";
 
 const nombres={
 original:"Datos originales",
@@ -38,8 +42,6 @@ rel:"Crecimiento relativo"
 
 title.textContent=nombres[metodo]
 
-title.style.marginTop = "5px"
-
 const svg = document.createElementNS(svgNS, "svg");
         
         // Ajustamos el viewBox para que no recorte los bordes de la provincia
@@ -48,10 +50,16 @@ const svg = document.createElementNS(svgNS, "svg");
         
         svg.style.width = "100%";
         svg.style.height = "100%";
+        svg.style.display = "block";
         svg.style.margin = "0";
 
-        card.appendChild(title);
-        card.appendChild(svg);
+        const mapContainer = document.createElement("div");
+mapContainer.className = "map-container";
+
+mapContainer.appendChild(svg);
+
+card.appendChild(title);
+card.appendChild(mapContainer);
 
 
 container.appendChild(card)
@@ -232,6 +240,9 @@ p.setAttribute("stroke","#000")
 p.setAttribute("stroke-width","2")
 
 })
+
+app.metodoActivo = metodo;
+actualizarPanelMetricas();
 
 actualizarGrafico()
 actualizarChartsSegunAlgoritmo()

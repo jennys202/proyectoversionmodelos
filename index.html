@@ -27,45 +27,65 @@
 
 <body>
 
-<h2 class="title">Dashboard población municipios Valladolid</h2>
+<header class="top-header">
 
-<div class="controls">
-
-<span id="info"></span>
-
-<div class="method-filter">
-
-  <div class="filterGroup">
-    <label>Transformación de la serie</label>
-    <div class="options-list">
-        <label><input type="checkbox" class="methodCheck" value="original" checked>Datos originales</label>
-        <label><input type="checkbox" class="methodCheck" value="mm" > Máximos y mínimos</label>
-        <label><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
-        <label><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
+    <div class="header-title">
+        <h1>Dashboard población municipios Valladolid</h1>
+        <span>
+            Sistema interactivo para el análisis de dinámicas demográficas
+        </span>
     </div>
-</div>
 
-  <div class="filterGroup">
-    <label>Algoritmo</label>
-    <div class="options-list">
-      <label><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
-      <label><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
-      <label><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
+    <div class="header-logos">
+
+        <img src="img/uvaia.png">
+        <img src="img/fecyt.png">
+        <img src="img/valladolid.png">
+
     </div>
-  </div>
 
-    <div class="filterGroup">
-    <label>Metrica de distancia</label>
-    <div class="options-list">
-        <label><input type="radio" name="distancia" value="euclidean" checked> Distancia euclídea</label>
-        <label><input type="radio" name="distancia" value="pearson"> Correlación de Pearson</label>
-    </div>
-</div>
+</header>
 
 
-    <div class="filterGroup">
-    <label>Parámetros</label>
-    <div class="inline" id="params-k">
+<div class="dashboard">
+
+    <!-- PANEL IZQUIERDO -->
+
+    <aside class="sidebar">
+
+        <div class="panel">
+         
+            <div class="section">
+                <h4>Transformación</h4>
+                <div class="options-list">
+                  <label class="option-item"><input type="checkbox" class="methodCheck" value="original">Datos originales</label>
+                  <label class="option-item"><input type="checkbox" class="methodCheck" value="mm" checked> Máximos y mínimos</label>
+                  <label class="option-item"><input type="checkbox" class="methodCheck" value="z"> Z-Score</label>
+                  <label class="option-item"><input type="checkbox" class="methodCheck" value="rel"> Crecimiento relativo</label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h4>Algoritmo</h4>
+                <div class="options-list">
+                  <label class="option-item"><input type="radio" name="algoritmo" value="kmeans" checked> K-Means</label>
+                  <label class="option-item"><input type="radio" name="algoritmo" value="kmedoids"> K-Medoids</label>
+                  <label class="option-item"><input type="radio" name="algoritmo" value="dbscan"> DBSCAN</label>
+                </div>
+            </div>
+
+            <div class="section">
+                <h4>Métrica</h4>
+                 <div class="options-list">
+                    <label class="option-item"><input type="radio" name="distancia" value="euclidean" checked> Distancia euclídea</label>
+                    <label class="option-item"><input type="radio" name="distancia" value="pearson"> Correlación de Pearson</label>
+                </div>
+            </div>
+
+            <div class="section">
+
+                <h4>Parámetros</h4>
+                <div class="param-row" id="params-k">
       <label>
         K:
         <select id="selectorK">
@@ -80,80 +100,113 @@
             <option value="10">10</option>
         </select>
     </label>
-    <button id="btnExportar">
-    Exportar K
-</button>
-    </div>
-    <div class="inline" id="params-dbscan">
-      <label>eps <input type="number" id="eps" step="0.01" value="0.5"></label>
-      <label>minPts <input type="number" id="minPts" value="3"></label>
-    </div>
-</div>
-
-
-<div class="filterGroup">
-    <label>Colores</label>
-    <div id="colorPanel" class="inline"></div>
-    <div>
-        <label>Intensidad de color:</label><br>
-        <input 
-          type="range" 
-          id="sliderIntensidad"
-          min="0" 
-          max="1" 
-          step="0.05" 
-          value="0.75"
-        >
-        <span id="valorIntensidad">0.75</span>
+        </div>
+        <div class="param-row" id="params-dbscan">
+          <label class="param-row">eps <input type="number" id="eps" step="0.01" value="0.5"></label>
+          <label class="param-row">minPts <input type="number" id="minPts" value="3"></label>
+        </div>
+            
       </div>
-  </div>
-<!--
-  <div class="filterGroup">
-    
-    <label>Visualización</label>
-    <div class="inline">
-      <label><input type="radio" name="modoColor" value="cluster" checked> Por cluster</label> 
-      <label><input type="radio" name="modoColor" value="centroide" checked> Por centroide</label>
-      <div>
-        <label>Intensidad de color:</label><br>
-        <input 
-          type="range" 
-          id="sliderIntensidad"
-          min="0.4" 
-          max="1" 
-          step="0.05" 
-          value="0.75"
-        >
-        <span id="valorIntensidad">0.75</span>
-      </div>
-    </div>
-  </div>
--->
+      
+            <div class="section">
+              <h4>Colores</h4>
+              <div id="colorPanel" class="color-panel"></div>
+            <div class="section">
+              <h5><label class="option-item">
+                  Intensidad del color
+              </label></h5>
+              <input
+                  type="range"
+                  id="sliderIntensidad"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="0.75">
+                  <span id="valorIntensidad">0.75</span>
+              </div>
+          </div>
 
-</div>
-  <div class="maps-toolbar">
-        <label class="toggleIslasMapa">
-            <input type="checkbox" id="toggleIslas">
-            Mostrar enclaves geográficos (islas)
-        </label>
-    </div>
+          <div class="section">
+            <label class="toggleIslasMapa">
+                  <input type="checkbox" id="toggleIslas">
+                  Mostrar islas
+              </label>
+          </div>
 
-<div class="panel">
+            <button class="export-btn" id="btnExportar">
+                Exportar resultados
+            </button>
 
-<div id="mapsContainer"></div>
+        </div>
 
-<div class="chart-container">
-  <div class="chart-wrapper" id="clusterChartContainer">
-  <canvas id="chartClusters"></canvas>
-  </div>
-  <div class="chart-wrapper">
-    <canvas id="chart"></canvas>
-  </div>
-</div>
+    </aside>
 
 
-</div>
+    <!-- MAPAS -->
 
+    <main class="maps-area">
+
+        <div class="maps-grid" id="mapsGrid">
+
+            <!--
+
+            Aquí el javascript irá creando
+
+            <div class="map-card">
+
+            -->
+
+        </div>
+
+    </main>
+
+
+
+    <!-- PANEL DERECHO -->
+
+    <aside class="results">
+
+        <div class="panel">
+            <h3>Patrones de referencia</h3>
+            <div id="clusterChartContainer">
+              <canvas id="chartClusters"></canvas>
+            </div>
+            <div id="municipioChartContainer">
+              <canvas id="chart"></canvas>
+            </div>
+
+        </div>
+
+        <div class="panel">
+            <h5 class="cluster-title">
+                Distribución de clusters
+            </h5>
+            <div id="clusterSummary"></div>
+             <hr>
+              <h5 class="cluster-title">Métricas</h5>
+            <table>
+              <tr>
+              <td>EMA</td>
+              <td id="ema"></td>
+              </tr>
+
+              <tr>
+              <td>Silhouette</td>
+              <td id="silhouette"></td>
+              </tr>
+
+              <tr>
+              <td>Coherencia territorial</td>
+              <td id="ct"></td>
+              </tr>
+
+              <tr>
+              <td>Enclaves geográficos</td>
+              <td id="islas"></td>
+              </tr>
+              </table>
+        </div>
+    </aside>
 </div>
 <div id="tooltip" class="tooltip"></div>
 

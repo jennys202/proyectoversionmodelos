@@ -17,6 +17,8 @@ app.colors=[
 
 app.selecciones = {}
 app.centroides={}
+app.metricas = {}
+app.asignaciones = {}
 
 app.modoColor = "centroide"
 
@@ -43,6 +45,7 @@ app.clusters={}
 app.selecciones = {}
 app.labelsPorMetodo = {}
 app.islasPorMetodo = {}
+app.asignaciones = {}
 
 metodos.forEach(m=>{
 
@@ -95,6 +98,7 @@ if(app.algoritmo === "dbscan"){
 app.clusters[m]=res.clusters
 app.centroides[m]=res.centroides
 app.labelsPorMetodo[m] = res.clusters
+app.asignaciones[m] = res.clusters;
 
 const resumen = resumenClusters(
     res.clusters
@@ -162,16 +166,28 @@ const islas = detectarIslas(
     vecinos
 );
 
+
+ const valorK =
+    app.algoritmo === "dbscan"
+        ? numClusters
+        : app.k;   
+
+app.metricas[m] = {
+    ema: ema,
+    silhouette: sil,
+    ct: ct,
+    islas: islas.length,
+    algoritmo: app.algoritmo,
+    metodo: m,
+    k: valorK
+}
+
 const numClusters =
     new Set(
         Object.values(res.clusters)
             .filter(c => c !== -1)
     ).size;
 
- const valorK =
-    app.algoritmo === "dbscan"
-        ? numClusters
-        : app.k;   
 
 console.log(
 [
@@ -208,10 +224,9 @@ if(app.mostrarIslas && metodos){
 }
 //  DESPUÉS dibujar
 dibujarMapas()
-
 crearSelectorColores()
-
 actualizarChartsSegunAlgoritmo();
+actualizarPanelMetricas();
 
 if(Object.keys(app.selecciones).length > 0){
   actualizarGrafico()
@@ -233,11 +248,11 @@ document.getElementById("toggleIslas").onchange = (e) => {
 
 }
 
-document.getElementById("btnExportar").onclick=exportarTodosLosK;
 
 app.recalcular()
 
 function exportarTodosLosK(){
+
 
     const filas = [];
     const metricas = [];
@@ -282,7 +297,7 @@ function exportarTodosLosK(){
                         kmeans(
                             dataset,
                             k,
-                            distanciaActual
+                            app.distanciaActual
                         );
 
                 }
@@ -292,7 +307,7 @@ function exportarTodosLosK(){
                          kmedoids(
                             dataset,
                             k,
-                            distanciaActual
+                            app.distanciaActual
                         );
 
                 }
@@ -343,14 +358,14 @@ function exportarTodosLosK(){
                         dataset,
                         resultado.clusters,
                         resultado.centroides,
-                        distanciaActual
+                        app.distanciaActual
                     );
 
                 const sil =
                     silhouette(
                         dataset,
                         resultado.clusters,
-                        distanciaActual
+                        app.distanciaActual
                     );
 
                 const ct =

@@ -196,3 +196,75 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+function actualizarPanelMetricas(){
+
+    const metodos = metodosActivos();
+
+    if(metodos.length === 0)
+        return;
+
+    const metodo = app.metodoActivo || metodos[0];
+
+    const m = app.metricas[metodo];
+
+    if(!m)
+        return;
+
+    document.getElementById("ema").textContent =
+        m.ema.toFixed(4);
+
+    document.getElementById("silhouette").textContent =
+        m.silhouette.toFixed(4);
+
+    document.getElementById("ct").textContent =
+        m.ct.toFixed(2) + " %";
+
+    document.getElementById("islas").textContent =
+        m.islas;
+
+    actualizarResumenClusters(metodo);
+
+}
+
+function actualizarResumenClusters(metodo){
+    const contenedor = document.getElementById("clusterSummary");
+    if(!contenedor)
+        return;
+    contenedor.innerHTML = "";
+    const asignaciones = app.asignaciones[metodo];
+    if(!asignaciones)
+        return;
+    const etiquetas = Object.values(asignaciones);
+
+    const total = etiquetas.length;
+    const conteo = new Array(app.k).fill(0);
+    etiquetas.forEach(c => {
+        if(c >= 0)
+            conteo[c]++;
+    });
+    for(let i=0;i<app.k;i++){
+        const porcentaje = total===0
+            ? 0
+            : conteo[i]*100/total;
+        const fila = document.createElement("div");
+        fila.className="cluster-row";
+        fila.innerHTML = `
+            <div class="cluster-left">
+                <div class="cluster-color"
+                     style="background:${app.colors[i]}">
+                </div>
+
+                <span>C${i}</span>
+            </div>
+
+            <div class="cluster-right">
+
+                ${conteo[i]} (${porcentaje.toFixed(1)}%)
+
+            </div>
+        `;
+        contenedor.appendChild(fila);
+    }
+
+}
