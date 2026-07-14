@@ -174,6 +174,12 @@ const islas = detectarIslas(
     vecinos
 );
 
+const numClusters =
+    new Set(
+        Object.values(res.clusters)
+            .filter(c => c !== -1)
+    ).size;
+
 
  const valorK =
     app.algoritmo === "dbscan"
@@ -189,12 +195,6 @@ app.metricas[m] = {
     metodo: m,
     k: valorK
 }
-
-const numClusters =
-    new Set(
-        Object.values(res.clusters)
-            .filter(c => c !== -1)
-    ).size;
 
 
 console.log(

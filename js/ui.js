@@ -86,7 +86,19 @@ input.oninput = e =>{
 
 app.colors[i] = e.target.value
 
-dibujarMapas()
+ // Actualizar mapas
+    dibujarMapas();
+
+    // Actualizar patrones de referencia
+    actualizarChartsSegunAlgoritmo();
+
+    // Actualizar gráfico del municipio seleccionado
+    if (Object.keys(app.selecciones).length > 0) {
+        actualizarGrafico();
+    }
+
+    // Actualizar distribución de clusters
+    actualizarPanelMetricas();
 
 }
 
