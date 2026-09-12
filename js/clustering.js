@@ -106,7 +106,7 @@ let min=Infinity
 
 centroides.forEach((c,i)=>{
 
-const d = distanciaEuclidea(p.vector,c)
+const d = distancia(p.vector,c)
 
 if(d<min){
 min=d
@@ -302,79 +302,112 @@ return Math.sqrt(suma)
 
 function kmedoids(dataset,k,distancia){
 
-let medoids = dataset.slice(0,k).map(d=>d.vector)
+    let medoids =
+        dataset
+            .slice(0,k)
+            .map(d=>d.vector);
 
-let clusters = {}
+    let clusters = {};
 
-let distanciaAct =
-    app.distancia === "pearson"
-        ? distanciaCorrelacion
-        : distanciaEuclidea;
+    for(let iter=0; iter<10; iter++){
 
-for(let iter=0;iter<10;iter++){
+        /* ==========================
+           ASIGNACIÓN
+        ========================== */
 
-/* asignación */
+        dataset.forEach(p=>{
 
-dataset.forEach(p=>{
+            let mejor = 0;
+            let distMin = Infinity;
 
-let mejor=0
-let distMin=Infinity
+            medoids.forEach((m,i)=>{
 
-medoids.forEach((m,i)=>{
+                const d =
+                    distancia(
+                        p.vector,
+                        m
+                    );
 
-const d = distanciaAct(p.vector,m)
+                if(d < distMin){
 
-if(d < distMin){
-distMin = d
-mejor = i
-}
+                    distMin = d;
+                    mejor = i;
 
-})
+                }
 
-clusters[p.codigo] = mejor
+            });
 
-})
+            clusters[p.codigo] = mejor;
 
-/* actualizar medoids */
+        });
 
-for(let i=0;i<k;i++){
 
-const miembros = dataset.filter(
-d => clusters[d.codigo] === i
-)
+        /* ==========================
+           ACTUALIZAR MEDOIDS
+        ========================== */
 
-if(!miembros.length) continue
+        for(let i=0; i<k; i++){
 
-let mejorMedoid = miembros[0].vector
-let mejorCoste = Infinity
+            const miembros =
+                dataset.filter(
+                    d =>
+                        clusters[d.codigo] === i
+                );
 
-miembros.forEach(candidato=>{
+            if(!miembros.length)
+                continue;
 
-let coste = 0
+            let mejorMedoid =
+                miembros[0].vector;
 
-miembros.forEach(m=>{
+            let mejorCoste =
+                Infinity;
 
-coste += distanciaAct(candidato.vector,m.vector)
 
-})
+            miembros.forEach(
+                candidato=>{
 
-if(coste < mejorCoste){
-mejorCoste = coste
-mejorMedoid = candidato.vector
-}
+                let coste = 0;
 
-})
+                miembros.forEach(m=>{
 
-medoids[i] = mejorMedoid
+                    coste +=
+                        distancia(
+                            candidato.vector,
+                            m.vector
+                        );
 
-}
+                });
 
-}
 
-return {
-clusters,
-centroides:medoids
-}
+                if(coste < mejorCoste){
+
+                    mejorCoste = coste;
+
+                    mejorMedoid =
+                        candidato.vector;
+
+                }
+
+            });
+
+
+            medoids[i] =
+                mejorMedoid;
+
+        }
+
+    }
+
+
+    return {
+
+        clusters,
+
+        centroides:
+            medoids
+
+    };
 
 }
 

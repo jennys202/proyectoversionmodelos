@@ -261,186 +261,573 @@ app.recalcular()
 
 function exportarTodosLosK(){
 
-
     const filas = [];
     const metricas = [];
 
+    /* ===================================
+       ALGORITMOS
+    =================================== */
+
     const algoritmos = [
         "kmeans",
-        "kmedoids"
+        "kmedoids",
+        "dbscan"
     ];
 
+    /* ===================================
+       TRANSFORMACIONES
+    =================================== */
+
     const metodos = [
-    "original",
-    "mm",
-    "z",
-    "rel"
+        "original",
+        "mm",
+        "z",
+        "rel"
     ];
 
     const nombresMetodo = {
-       original:"Original",
-        mm:"MaxMin",
-        z:"ZScore",
-        rel:"Relativo"
+        original: "Original",
+        mm: "MaxMin",
+        z: "ZScore",
+        rel: "Relativo"
     };
+
+    /* ===================================
+       MÉTRICAS DE DISTANCIA
+    =================================== */
+
+    const metricasDistancia = [
+        {
+            nombre: "Euclídea",
+            funcion: distanciaEuclidea
+        },
+        {
+            nombre: "Pearson",
+            funcion: distanciaCorrelacion
+        }
+    ];
+
+    /* ===================================
+       VECINOS TOPOLOGICOS
+    =================================== */
 
     const vecinos =
         construirVecinosTopologicos();
 
+    /* ===================================
+       AÑOS DE LA SERIE TEMPORAL
+    =================================== */
+
+    const primerCodigo =
+        localidades[0].codigo;
+
+    const anios =
+        Object.keys(
+            poblacionHistorica[primerCodigo].datos
+        );
+
+    /* ===================================
+       RECORRER ALGORITMOS
+    =================================== */
+
     algoritmos.forEach(algoritmo => {
 
-        metodos.forEach(m => {
+        /* =================================
+           RECORRER TRANSFORMACIONES
+        ================================= */
+
+        metodos.forEach(metodo => {
 
             const dataset =
-                construirDataset(m);
+                construirDataset(metodo);
+
+            /* ===============================
+               RECORRER MÉTRICAS
+            =============================== */
+
+            metricasDistancia.forEach(metrica => {
+
+                const distancia =
+                    metrica.funcion;
 
 
-            for(let k=2; k<=10; k++){
+                /* ==================================================
+                   K-MEANS Y K-MEDOIDS
+                   K = 2 ... 10
+                ================================================== */
 
-                let resultado;
+                if(
+                    algoritmo === "kmeans" ||
+                    algoritmo === "kmedoids"
+                ){
 
-                if(algoritmo === "kmeans"){
+                    for(let k=2; k<=10; k++){
 
-                    resultado =
-                        kmeans(
-                            dataset,
-                            k,
-                            app.distanciaActual
-                        );
+                        let resultado;
+
+
+                        /* ==========================
+                           EJECUTAR ALGORITMO
+                        ========================== */
+
+                        if(
+                            algoritmo === "kmeans"
+                        ){
+
+                            resultado =
+                                kmeans(
+                                    dataset,
+                                    k,
+                                    distancia
+                                );
+
+                        }
+                        else{
+
+                            resultado =
+                                kmedoids(
+                                    dataset,
+                                    k,
+                                    distancia
+                                );
+
+                        }
+
+
+                        /* ==========================
+                           CLASIFICACIÓN
+                        ========================== */
+
+                        Object.entries(
+                            resultado.clusters
+                        ).forEach(
+                            ([codigo, cluster]) => {
+
+                            const municipio =
+                                localidades.find(
+                                    l =>
+                                        l.codigo === codigo
+                                );
+
+
+                            /*
+                             * Obtener centroide
+                             * del cluster asignado
+                             */
+
+                            let centroide = null;
+
+
+                            if(
+                                resultado.centroides &&
+                                resultado.centroides[cluster]
+                            ){
+
+                                centroide =
+                                    resultado.centroides[cluster];
+
+                            }
+
+
+                            /* ==========================
+                               REGISTRO
+                            ========================== */
+
+                            const fila = {
+
+                                algoritmo:
+                                    algoritmo,
+
+                                metrica:
+                                    metrica.nombre,
+
+                                metodo:
+                                    nombresMetodo[metodo],
+
+                                k:
+                                    k,
+
+                                eps:
+                                    "",
+
+                                minPts:
+                                    "",
+
+                                codigo:
+                                    codigo,
+
+                                municipio:
+                                    municipio?.nombre || "",
+
+                                cluster:
+                                    cluster
+
+                            };
+
+
+                            /* ==========================
+                               CENTROIDE
+                            ========================== */
+
+                            anios.forEach(
+                                (anio, index) => {
+
+                                fila[
+                                    "centroide_" + anio
+                                ] =
+                                    centroide
+                                        ? centroide[index]
+                                        : "";
+
+                            });
+
+
+                            filas.push(fila);
+
+                        });
+
+
+                        /* ==========================
+                           MÉTRICAS
+                        ========================== */
+
+                        const ema =
+                            calcularEMA(
+                                dataset,
+                                resultado.clusters,
+                                resultado.centroides,
+                                distancia
+                            );
+
+
+                        const sil =
+                            silhouette(
+                                dataset,
+                                resultado.clusters,
+                                distancia
+                            );
+
+
+                        const ct =
+                            calcularCT(
+                                resultado.clusters,
+                                vecinos
+                            );
+
+
+                        const islas =
+                            detectarIslas(
+                                resultado.clusters,
+                                vecinos
+                            );
+
+
+                        /*
+                         * Número de clusters
+                         */
+
+                        const numeroClusters =
+                            new Set(
+                                Object.values(
+                                    resultado.clusters
+                                ).filter(
+                                    c => c !== -1
+                                )
+                            ).size;
+
+
+                        /* ==========================
+                           GUARDAR MÉTRICAS
+                        ========================== */
+
+                        metricas.push({
+
+                            algoritmo:
+                                algoritmo,
+
+                            metrica:
+                                metrica.nombre,
+
+                            metodo:
+                                nombresMetodo[metodo],
+
+                            k:
+                                k,
+
+                            eps:
+                                "",
+
+                            minPts:
+                                "",
+
+                            clusters:
+                                numeroClusters,
+
+                            ruido:
+                                0,
+
+                            ema:
+                                Number(
+                                    ema.toFixed(4)
+                                ),
+
+                            silhouette:
+                                Number(
+                                    sil.toFixed(4)
+                                ),
+
+                            ct:
+                                Number(
+                                    ct.toFixed(2)
+                                ),
+
+                            islas:
+                                islas.length
+
+                        });
+
+                    }
 
                 }
-                else{
 
-                    resultado =
-                         kmedoids(
+
+                /* ==================================================
+                   DBSCAN
+                   No utiliza K
+                ================================================== */
+
+                if(
+                    algoritmo === "dbscan"
+                ){
+
+                    const resultado =
+                        dbscan(
                             dataset,
-                            k,
-                            app.distanciaActual
+                            app.eps,
+                            app.minPts,
+                            distancia
                         );
 
-                }
 
-                /* ===================================
-                   CLASIFICACIÓN
-                =================================== */
+                    /* ==========================
+                       CLASIFICACIÓN
+                    ========================== */
 
-                Object.entries(
-                    resultado.clusters
-                ).forEach(([codigo, cluster]) => {
+                    Object.entries(
+                        resultado.clusters
+                    ).forEach(
+                        ([codigo, cluster]) => {
 
-                    const municipio =
-                        localidades.find(
-                            l => l.codigo === codigo
-                        );
+                        const municipio =
+                            localidades.find(
+                                l =>
+                                    l.codigo === codigo
+                            );
 
-                    filas.push({
 
-                        algoritmo:
-                            algoritmo,
+                        /*
+                         * DBSCAN no genera
+                         * centroides
+                         */
 
-                        metodo:
-                            nombresMetodo[m],
+                        const fila = {
 
-                        k:
-                            k,
+                            algoritmo:
+                                "dbscan",
 
-                        codigo:
-                            codigo,
+                            metrica:
+                                metrica.nombre,
 
-                        municipio:
-                            municipio?.nombre || "",
+                            metodo:
+                                nombresMetodo[metodo],
 
-                        cluster:
-                            cluster
+                            k:
+                                "",
+
+                            eps:
+                                app.eps,
+
+                            minPts:
+                                app.minPts,
+
+                            codigo:
+                                codigo,
+
+                            municipio:
+                                municipio?.nombre || "",
+
+                            cluster:
+                                cluster
+
+                        };
+
+
+                        /*
+                         * Dejar vacías las columnas
+                         * de centroides
+                         */
+
+                        anios.forEach(
+                            anio => {
+
+                            fila[
+                                "centroide_" + anio
+                            ] = "";
+
+                        });
+
+
+                        filas.push(fila);
 
                     });
 
-                });
 
-                /* ===================================
-                   MÉTRICAS
-                =================================== */
+                    /* ==========================
+                       MÉTRICAS DBSCAN
+                    ========================== */
 
-                const ema =
-                    calcularEMA(
-                        dataset,
-                        resultado.clusters,
-                        resultado.centroides,
-                        app.distanciaActual
-                    );
+                    const sil =
+                        silhouette(
+                            dataset,
+                            resultado.clusters,
+                            distancia
+                        );
 
-                const sil =
-                    silhouette(
-                        dataset,
-                        resultado.clusters,
-                        app.distanciaActual
-                    );
 
-                const ct =
-                    calcularCT(
-                        resultado.clusters,
-                        vecinos
-                    );
+                    const ct =
+                        calcularCT(
+                            resultado.clusters,
+                            vecinos
+                        );
 
-                const islas =
-                    detectarIslas(
-                        resultado.clusters,
-                        vecinos
-                    );
 
-                metricas.push({
+                    const islas =
+                        detectarIslas(
+                            resultado.clusters,
+                            vecinos
+                        );
 
-                    algoritmo:
-                        algoritmo,
 
-                    metodo:
-                        nombresMetodo[m],
+                    /* ==========================
+                       NÚMERO DE CLUSTERS
+                    ========================== */
 
-                    k:
-                        k,
+                    const numeroClusters =
+                        new Set(
+                            Object.values(
+                                resultado.clusters
+                            ).filter(
+                                c => c !== -1
+                            )
+                        ).size;
 
-                    ema:
-                        Number(
-                            ema.toFixed(4)
-                        ),
 
-                    silhouette:
-                        Number(
-                            sil.toFixed(4)
-                        ),
+                    /* ==========================
+                       MUNICIPIOS RUIDO
+                    ========================== */
 
-                    ct:
-                        Number(
-                            ct.toFixed(2)
-                        ),
+                    const ruido =
+                        Object.values(
+                            resultado.clusters
+                        ).filter(
+                            c => c === -1
+                        ).length;
 
-                    islas:
-                        islas.length
 
-                });
+                    /* ==========================
+                       GUARDAR MÉTRICAS
+                    ========================== */
 
-            }
+                    metricas.push({
+
+                        algoritmo:
+                            "dbscan",
+
+                        metrica:
+                            metrica.nombre,
+
+                        metodo:
+                            nombresMetodo[metodo],
+
+                        k:
+                            "",
+
+                        eps:
+                            app.eps,
+
+                        minPts:
+                            app.minPts,
+
+                        clusters:
+                            numeroClusters,
+
+                        ruido:
+                            ruido,
+
+                        /*
+                         * DBSCAN no utiliza
+                         * centroides, por tanto
+                         * EMA no aplica.
+                         */
+
+                        ema:
+                            "",
+
+                        silhouette:
+                            Number(
+                                sil.toFixed(4)
+                            ),
+
+                        ct:
+                            Number(
+                                ct.toFixed(2)
+                            ),
+
+                        islas:
+                            islas.length
+
+                    });
+
+                }
+
+            });
 
         });
 
     });
 
+
     /* ===================================
-       CREAR EXCEL
+       CREAR ARCHIVO EXCEL
     =================================== */
 
     const wb =
         XLSX.utils.book_new();
+
+
+    /* ===================================
+       HOJA CLASIFICACIÓN
+    =================================== */
 
     const wsClasificacion =
         XLSX.utils.json_to_sheet(
             filas
         );
 
+
+    /* ===================================
+       HOJA MÉTRICAS
+    =================================== */
+
     const wsMetricas =
         XLSX.utils.json_to_sheet(
             metricas
         );
+
+
+    /* ===================================
+       AGREGAR HOJAS
+    =================================== */
 
     XLSX.utils.book_append_sheet(
         wb,
@@ -454,9 +841,17 @@ function exportarTodosLosK(){
         "Metricas"
     );
 
+
+    /* ===================================
+       DESCARGAR
+    =================================== */
+
     XLSX.writeFile(
         wb,
         "Analisis_Clustering_Valladolid.xlsx"
     );
 
 }
+
+document.getElementById("btnExportar")
+    .addEventListener("click", exportarTodosLosK);
